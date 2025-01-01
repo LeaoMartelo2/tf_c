@@ -58,6 +58,8 @@ __int64_t create_move_hook(void *this, float sample_time, struct user_cmd *user_
         bunny_hop(localplayer, user_cmd);
         autostrafe(localplayer, user_cmd);
         rage_autostrafe(localplayer, user_cmd);
+
+        auto_rocketjump(localplayer, user_cmd);
     }
 
     if (silent_aim)

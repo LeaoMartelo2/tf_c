@@ -16,3 +16,4 @@ void projectile_aimbot(void *localplayer, struct user_cmd *user_cmd, int weapon_
 void bunny_hop(void *localplayer, struct user_cmd *user_cmd);
 void autostrafe(void *localplayer, struct user_cmd *user_cmd);
 void rage_autostrafe(void *localplayer, struct user_cmd *user_cmd);
+void auto_rocketjump(void *localplayer, struct user_cmd *user_cmd);

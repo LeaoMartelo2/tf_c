@@ -31,6 +31,7 @@ struct config
         bool do_thirdperson;
         int legit_autostrafe;
         int rage_autostrafe;
+        int auto_rocketjump;
     } misc;
     struct
     {

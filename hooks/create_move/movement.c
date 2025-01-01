@@ -1,5 +1,7 @@
 #include "../../config/config.h"
 #include "../../source_sdk/entity/entity.h"
+#include "../../source_sdk/entity/weapon_entity.h"
+#include "../../source_sdk/entity_list/entity_list.h"
 #include "../../source_sdk/math/vec3.h"
 #include "../../source_sdk/user_cmd.h"
 #include "../../utils/math/math_utils.h"
@@ -7,6 +9,7 @@
 #include "create_move.h"
 #include <math.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 void bunny_hop(void *localplayer, struct user_cmd *user_cmd)
 {
@@ -124,4 +127,72 @@ void rage_autostrafe(void *localplayer, struct user_cmd *user_cmd)
 
     user_cmd->forwardmove = cosf(move_direction) * cl_forwardspeed;
     user_cmd->sidemove = -sinf(move_direction) * cl_sidespeed;
+}
+
+void auto_rocketjump(void *localplayer, struct user_cmd *user_cmd)
+{
+    // disable if not holding m2
+    // TODO: custom keybinding?
+    const bool is_soldier = get_player_class(localplayer) == TF_CLASS_SOLDIER;
+    if (!config.misc.auto_rocketjump || !is_soldier)
+    {
+        return;
+    }
+
+    const bool on_ground = get_ent_flags(localplayer) & FL_ONGROUND;
+    if (!on_ground || !(user_cmd->buttons & IN_ATTACK2))
+    {
+        return;
+    }
+
+    // has config active, is soldier, is on ground, and has the button held
+
+    void *active_weapon = get_client_entity(get_active_weapon(localplayer));
+
+    if (active_weapon == NULL)
+    {
+        return;
+    }
+
+    const int weapon_id = get_weapon_id(active_weapon);
+    // rocket launchers, direct hit, cowmangler
+    if (weapon_id != TF_WEAPON_ROCKETLAUNCHER &&
+
+        weapon_id != TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT &&
+
+        weapon_id != TF_WEAPON_PARTICLE_CANNON)
+    {
+        return;
+    }
+
+    if (!can_attack(localplayer))
+    {
+        return;
+    }
+
+    // weapon is suitable for rocket jumping, and is able to fire
+
+    struct vec3_t velocity = get_ent_velocity(localplayer);
+
+    if (velocity.x == 0.0f && velocity.y == 0.0f)
+    {
+        // if the player is standing still, shoot straight down
+        user_cmd->viewangles.x = 89.0f; // viewangles is capped at that not at 90!!!!
+    }
+    else
+    {
+        struct vec3_t velocity_angle = angle_from_velo(velocity);
+        // shoot straight backwards at 45 degrees
+        // TODO: take in rocket launchers rocket origin offsets in to account
+        // as it dosent go in a straight line if not using the original,
+        // TODO: maybe add a custom angle setting (?)
+        user_cmd->viewangles.x = 45.0f;
+        user_cmd->viewangles.y = velocity_angle.y - 180.0f;
+    }
+
+    // release the button
+    user_cmd->buttons &= ~IN_ATTACK2;
+    // press keys for rocket jumping
+    // TODO: maybe add a option for c-tapping (not really worth it)
+    user_cmd->buttons |= IN_ATTACK | IN_DUCK | IN_JUMP;
 }

@@ -105,6 +105,16 @@ struct vec3_t get_view_angle(struct vec3_t diff)
     return view_angle;
 }
 
+float vec3_dotproduct(struct vec3_t a, struct vec3_t b)
+{
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+
+float vec_lenght(struct vec3_t vec)
+{
+    return sqrtf(vec3_dotproduct(vec, vec));
+}
+
 float vec_lenght2d(struct vec3_t vec)
 {
     return sqrtf(vec.x * vec.x + vec.y * vec.y);
@@ -113,6 +123,11 @@ float vec_lenght2d(struct vec3_t vec)
 float deg_2_rad(float n)
 {
     return n * M_PI / 180.0f;
+}
+
+float rad_2_deg(float n)
+{
+    return n * 180.0f / M_PI;
 }
 
 float delta_rad_angle2f(float a, float b)
@@ -130,4 +145,35 @@ float delta_rad_angle2f(float a, float b)
     }
 
     return delta;
+}
+
+struct vec3_t angle_from_velo(struct vec3_t velo)
+{
+
+    if (velo.y == 0.0f && velo.x == 0.0f)
+    {
+        if (velo.z > 0.0f)
+        {
+            return (struct vec3_t) {270, 0, 0};
+        }
+        else
+        {
+            return (struct vec3_t) {90, 0, 0};
+        }
+    }
+
+    float pitch = rad_2_deg(atan2f(-velo.z, vec_lenght(velo)));
+    float yaw = rad_2_deg(atan2f(velo.y, velo.x));
+
+    if (pitch < 0.0f)
+    {
+        pitch += 360.0f;
+    }
+
+    if (yaw < 0.0f)
+    {
+        yaw += 350.0f;
+    }
+
+    return (struct vec3_t) {pitch, yaw, 0.0f};
 }

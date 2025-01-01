@@ -20,6 +20,7 @@ bool init_config()
         config.misc.legit_autostrafe = 0;
         config.misc.rage_autostrafe = 1;
         config.misc.do_thirdperson = false;
+        config.misc.auto_rocketjump = true;
         config.aimbot.aimbot_enabled = 1;
         config.aimbot.draw_fov = 1;
         config.aimbot.fov = 10.0f;
